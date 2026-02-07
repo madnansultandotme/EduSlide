@@ -11,6 +11,7 @@ export default function Navbar() {
     { href: "/", label: "Home" },
     { href: "/about", label: "About" },
     { href: "/contact", label: "Contact" },
+    { href: "/dashboard", label: "Dashboard" },
   ];
 
   return (
@@ -55,8 +56,14 @@ export default function Navbar() {
               </Link>
             ))}
             <Link
+              href="/login"
+              className="ml-4 px-6 py-2 rounded-lg border-2 border-indigo-600 text-indigo-600 font-semibold hover:bg-indigo-50 transition-all duration-200"
+            >
+              Login
+            </Link>
+            <Link
               href="/upload"
-              className="ml-4 px-6 py-2 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition-all duration-200"
+              className="px-6 py-2 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition-all duration-200"
             >
               Get Started
             </Link>
