@@ -2,8 +2,17 @@
 
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 export default function Navbar() {
+  const pathname = usePathname();
+
+  const navLinks = [
+    { href: "/", label: "Home" },
+    { href: "/about", label: "About" },
+    { href: "/contact", label: "Contact" },
+  ];
+
   return (
     <nav className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -30,6 +39,38 @@ export default function Navbar() {
             </div>
           </Link>
 
+          {/* Navigation Links */}
+          <div className="hidden md:flex items-center space-x-1">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                  pathname === link.href
+                    ? "text-indigo-600 bg-indigo-50"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+            <Link
+              href="/upload"
+              className="ml-4 px-6 py-2 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition-all duration-200"
+            >
+              Get Started
+            </Link>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <div className="md:hidden">
+            <Link
+              href="/upload"
+              className="px-4 py-2 rounded-lg bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-700 transition-all duration-200"
+            >
+              Get Started
+            </Link>
+          </div>
         </div>
       </div>
     </nav>

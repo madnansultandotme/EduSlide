@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Sparkles, FileText, Zap, BookOpen, ArrowRight, CheckCircle2, Award, Shield, TrendingUp } from "lucide-react";
+import { Sparkles, FileText, Zap, BookOpen, ArrowRight, CheckCircle2, Award, Shield, TrendingUp, Upload, Download } from "lucide-react";
 
 export default function Home() {
   return (
@@ -143,6 +143,176 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* How It Works Section */}
+      <div className="bg-white py-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold text-slate-800 mb-4">How It Works</h2>
+              <p className="text-lg text-slate-600">Create professional presentations in three simple steps</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                {
+                  step: "1",
+                  title: "Upload or Enter Topic",
+                  description: "Upload your PDF, eBook, or simply type in the topic you want to create a presentation about.",
+                  icon: Upload
+                },
+                {
+                  step: "2",
+                  title: "AI Processing",
+                  description: "Our advanced AI analyzes your content and automatically generates well-structured slides with professional design.",
+                  icon: Sparkles
+                },
+                {
+                  step: "3",
+                  title: "Download & Present",
+                  description: "Review your slides, make any adjustments, and download your PowerPoint presentation ready to use.",
+                  icon: Download
+                }
+              ].map((item, index) => {
+                const Icon = item.icon;
+                return (
+                  <div key={index} className="relative">
+                    <div className="flex flex-col items-center text-center">
+                      <div className="w-16 h-16 rounded-full bg-indigo-600 text-white flex items-center justify-center text-2xl font-bold mb-4">
+                        {item.step}
+                      </div>
+                      <div className="w-12 h-12 rounded-lg bg-indigo-100 flex items-center justify-center mb-4">
+                        <Icon className="w-6 h-6 text-indigo-600" />
+                      </div>
+                      <h3 className="text-xl font-semibold text-slate-800 mb-2">{item.title}</h3>
+                      <p className="text-slate-600">{item.description}</p>
+                    </div>
+                    {index < 2 && (
+                      <div className="hidden md:block absolute top-8 left-full w-full h-0.5 bg-indigo-200 -translate-x-1/2"></div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Testimonials Section */}
+      <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold text-slate-800 mb-4">What Educators Say</h2>
+              <p className="text-lg text-slate-600">Trusted by thousands of teachers worldwide</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                {
+                  name: "Sarah Johnson",
+                  role: "High School Teacher",
+                  content: "EduSlide AI has transformed how I prepare for classes. What used to take hours now takes minutes!",
+                  rating: 5
+                },
+                {
+                  name: "Michael Chen",
+                  role: "University Professor",
+                  content: "The quality of presentations is outstanding. My students are more engaged than ever before.",
+                  rating: 5
+                },
+                {
+                  name: "Emily Rodriguez",
+                  role: "Elementary Teacher",
+                  content: "Simple to use and produces beautiful results. It's become an essential tool in my teaching toolkit.",
+                  rating: 5
+                }
+              ].map((testimonial, index) => (
+                <div key={index} className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                  <div className="flex mb-4">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <svg key={i} className="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                        <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                      </svg>
+                    ))}
+                  </div>
+                  <p className="text-slate-700 mb-4 italic">&ldquo;{testimonial.content}&rdquo;</p>
+                  <div>
+                    <p className="font-semibold text-slate-800">{testimonial.name}</p>
+                    <p className="text-sm text-slate-600">{testimonial.role}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* CTA Section */}
+      <div className="bg-indigo-600 py-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-4xl font-bold text-white mb-4">
+              Ready to Transform Your Teaching?
+            </h2>
+            <p className="text-xl text-indigo-100 mb-8">
+              Join thousands of educators who are saving time and creating better presentations
+            </p>
+            <Link
+              href="/upload"
+              className="inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-white text-indigo-600 font-semibold text-lg shadow-lg hover:bg-slate-50 transition-all duration-200"
+            >
+              <Sparkles className="w-5 h-5" />
+              <span>Start Creating Now</span>
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="bg-slate-900 text-slate-300 py-12">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+              <div className="flex items-center space-x-2 mb-4">
+                <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-white font-bold text-lg">EduSlide AI</span>
+              </div>
+              <p className="text-sm">Transform your teaching materials into professional presentations with AI.</p>
+            </div>
+            <div>
+              <h4 className="text-white font-semibold mb-4">Product</h4>
+              <ul className="space-y-2 text-sm">
+                <li><Link href="/upload" className="hover:text-white transition-colors">Get Started</Link></li>
+                <li><Link href="/#features" className="hover:text-white transition-colors">Features</Link></li>
+                <li><Link href="/#pricing" className="hover:text-white transition-colors">Pricing</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-white font-semibold mb-4">Company</h4>
+              <ul className="space-y-2 text-sm">
+                <li><Link href="/about" className="hover:text-white transition-colors">About Us</Link></li>
+                <li><Link href="/contact" className="hover:text-white transition-colors">Contact</Link></li>
+                <li><Link href="#" className="hover:text-white transition-colors">Blog</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-white font-semibold mb-4">Legal</h4>
+              <ul className="space-y-2 text-sm">
+                <li><Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+                <li><Link href="#" className="hover:text-white transition-colors">Terms of Service</Link></li>
+                <li><Link href="#" className="hover:text-white transition-colors">Cookie Policy</Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="max-w-6xl mx-auto mt-8 pt-8 border-t border-slate-800 text-center text-sm">
+            <p>&copy; 2024 EduSlide AI. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
