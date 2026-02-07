@@ -15,7 +15,7 @@ export default function AboutPage() {
               Empowering Educators with AI Technology
             </h1>
             <p className="text-xl text-slate-600 leading-relaxed">
-              We're on a mission to transform how educators create presentations, 
+              We&apos;re on a mission to transform how educators create presentations, 
               saving time and enhancing the learning experience for students worldwide.
             </p>
           </div>
@@ -35,7 +35,7 @@ export default function AboutPage() {
                 matters most: teaching.
               </p>
               <p className="text-lg text-slate-600">
-                We're committed to making high-quality educational tools accessible to every 
+                We&apos;re committed to making high-quality educational tools accessible to every 
                 educator, regardless of their technical expertise or budget constraints.
               </p>
             </div>
