@@ -7,7 +7,7 @@ export default function TopicInput({ topic, setTopic }) {
         value={topic}
         onChange={(e) => setTopic(e.target.value)}
         placeholder="e.g., Introduction to Quantum Physics, World War II History, Python Programming Basics..."
-        className="w-full min-h-[150px] px-6 py-4 bg-linear-to-br from-slate-800/60 to-slate-900/60 border-2 border-slate-600 rounded-2xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all duration-300 resize-none font-medium text-base"
+        className="w-full min-h-[150px] px-6 py-4 bg-slate-50 border-2 border-slate-300 rounded-xl text-slate-800 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200 resize-none font-medium text-base"
       />
     </div>
   );
