@@ -341,16 +341,7 @@ The system manages connections efficiently to optimize performance and resource 
 - Avatar upload placeholder
 
 ✅ **File Upload System**
-- Drag-and-drop file upload
-- Support for PDF, DOCX, EPUB formats
-- File validation and preview
-- Topic input alternative
-
-✅ **Slide Preview**
-- Interactive slide navigation
-- Thumbnail grid view
-- Full-screen slide display
-- Download button (demo mode)
+- Drag-and-drop file up
 
 ### In Progress
 

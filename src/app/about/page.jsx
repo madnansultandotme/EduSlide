@@ -1,6 +1,19 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Sparkles, Target, Users, Lightbulb, Heart } from "lucide-react";
 
 export default function AboutPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    // Redirect logged-in users to dashboard
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      router.push("/dashboard");
+    }
+  }, [router]);
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Hero Section */}

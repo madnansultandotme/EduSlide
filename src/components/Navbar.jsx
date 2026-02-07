@@ -1,18 +1,48 @@
 "use client";
 
 import Link from "next/link";
-import { Sparkles } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { Sparkles, User, LogOut } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userName, setUserName] = useState("");
 
-  const navLinks = [
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    const name = localStorage.getItem("userName");
+    setIsLoggedIn(!!token);
+    setUserName(name || "User");
+  }, [pathname]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("userRole");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("userEmail");
+    setIsLoggedIn(false);
+    router.push("/");
+  };
+
+  // Public navigation links (for non-logged-in users)
+  const publicNavLinks = [
     { href: "/", label: "Home" },
     { href: "/about", label: "About" },
     { href: "/contact", label: "Contact" },
-    { href: "/dashboard", label: "Dashboard" },
   ];
+
+  // Authenticated navigation links (for logged-in users)
+  const authNavLinks = [
+    { href: "/dashboard", label: "Dashboard" },
+    { href: "/upload", label: "Create" },
+    { href: "/dashboard/presentations", label: "Presentations" },
+    { href: "/dashboard/topics", label: "Topics" },
+  ];
+
+  const navLinks = isLoggedIn ? authNavLinks : publicNavLinks;
 
   return (
     <nav className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
@@ -55,34 +85,79 @@ export default function Navbar() {
                 {link.label}
               </Link>
             ))}
-            <Link
-              href="/login"
-              className="ml-4 px-6 py-2 rounded-lg border-2 border-indigo-600 text-indigo-600 font-semibold hover:bg-indigo-50 transition-all duration-200"
-            >
-              Login
-            </Link>
-            <Link
-              href="/signup"
-              className="px-6 py-2 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition-all duration-200"
-            >
-              Sign Up
-            </Link>
+            
+            {/* Show Login/Signup for non-logged-in users */}
+            {!isLoggedIn && (
+              <>
+                <Link
+                  href="/login"
+                  className="ml-4 px-6 py-2 rounded-lg border-2 border-indigo-600 text-indigo-600 font-semibold hover:bg-indigo-50 transition-all duration-200"
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/signup"
+                  className="px-6 py-2 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition-all duration-200"
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
+
+            {/* Show Profile/Logout for logged-in users */}
+            {isLoggedIn && (
+              <>
+                <Link
+                  href="/dashboard/profile"
+                  className="ml-4 flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-indigo-600 text-indigo-600 font-semibold hover:bg-indigo-50 transition-all duration-200"
+                >
+                  <User className="w-4 h-4" />
+                  {userName}
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 px-6 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 transition-all duration-200"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Logout
+                </button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center gap-2">
-            <Link
-              href="/login"
-              className="px-4 py-2 rounded-lg border border-indigo-600 text-indigo-600 font-semibold text-sm hover:bg-indigo-50 transition-all duration-200"
-            >
-              Login
-            </Link>
-            <Link
-              href="/signup"
-              className="px-4 py-2 rounded-lg bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-700 transition-all duration-200"
-            >
-              Sign Up
-            </Link>
+            {!isLoggedIn ? (
+              <>
+                <Link
+                  href="/login"
+                  className="px-4 py-2 rounded-lg border border-indigo-600 text-indigo-600 font-semibold text-sm hover:bg-indigo-50 transition-all duration-200"
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/signup"
+                  className="px-4 py-2 rounded-lg bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-700 transition-all duration-200"
+                >
+                  Sign Up
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/dashboard/profile"
+                  className="p-2 rounded-lg border border-indigo-600 text-indigo-600 hover:bg-indigo-50 transition-all duration-200"
+                >
+                  <User className="w-5 h-5" />
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="p-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-all duration-200"
+                >
+                  <LogOut className="w-5 h-5" />
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
