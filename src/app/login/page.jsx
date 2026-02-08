@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Sparkles, Lock, User, Eye, EyeOff, LogIn } from "lucide-react";
 import Link from "next/link";
+import { login as apiLogin } from "../../lib/api";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -20,34 +21,29 @@ export default function LoginPage() {
     }
   }, [router]);
 
-  const handleLogin = (e) => {
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
-    // Check demo admin credentials
-    if (username === "admin" && password === "admin123") {
-      localStorage.setItem("authToken", "demo-token-123");
-      localStorage.setItem("userRole", "educator");
-      localStorage.setItem("userName", "Admin User");
-      router.push("/dashboard");
-      return;
-    }
+    try {
+      const user = await apiLogin({ username, password });
 
-    // Check registered users
-    const users = JSON.parse(localStorage.getItem("users") || "[]");
-    const user = users.find(
-      u => u.username === username && u.password === password
-    );
-
-    if (user) {
-      // Store auth token and user info
-      localStorage.setItem("authToken", `token-${user.id}`);
-      localStorage.setItem("userRole", user.role);
-      localStorage.setItem("userName", user.fullName);
-      localStorage.setItem("userEmail", user.email);
-      router.push("/dashboard");
-    } else {
+      if (user) {
+        // Store auth info in localStorage for session
+        localStorage.setItem("authToken", `token-${user.id}`);
+        localStorage.setItem("userId", user.id);
+        localStorage.setItem("userRole", user.role || "educator");
+        localStorage.setItem("userName", user.full_name || user.username);
+        localStorage.setItem("userEmail", user.email);
+        router.push("/dashboard");
+      }
+    } catch (err) {
       setError("Invalid username or password");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -123,17 +119,22 @@ export default function LoginPage() {
 
             {/* Demo Credentials */}
             <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-xs text-blue-800 font-medium mb-1">Demo Credentials:</p>
-              <p className="text-xs text-blue-700">Username: admin | Password: admin123</p>
+              <p className="text-xs text-blue-800 font-medium mb-1">Note:</p>
+              <p className="text-xs text-blue-700">Sign up first to create your account, then log in here</p>
             </div>
 
             {/* Login Button */}
             <button
               type="submit"
-              className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-all duration-200 shadow-md hover:shadow-lg"
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <LogIn className="w-5 h-5" />
-              Sign In
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <LogIn className="w-5 h-5" />
+              )}
+              {loading ? "Signing In..." : "Sign In"}
             </button>
           </form>
 

@@ -2,21 +2,114 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Upload, Sparkles, FileText, Zap, ArrowRight, Layers } from "lucide-react";
+import { Upload, Sparkles, FileText, Zap, ArrowRight, Layers, AlertCircle } from "lucide-react";
 import FileUpload from "../../components/FileUpload";
 import TopicInput from "../../components/TopicInput";
 import TemplateSelector from "../../components/TemplateSelector";
+import { createPresentation, createUpload, updatePresentation } from "../../lib/api";
 
 export default function UploadPage() {
   const [file, setFile] = useState(null);
   const [topic, setTopic] = useState("");
   const [selectedTemplate, setSelectedTemplate] = useState("modern-professional");
   const [showTemplates, setShowTemplates] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [progress, setProgress] = useState("");
+  const [error, setError] = useState("");
   const router = useRouter();
 
-  function handleGenerate() {
-    const fakeFileId = "demo123";
-    router.push(`/preview?fileId=${fakeFileId}&topic=${encodeURIComponent(topic)}&template=${selectedTemplate}`);
+  async function handleGenerate() {
+    setGenerating(true);
+    setError("");
+    setProgress("Preparing...");
+
+    try {
+      const userId = localStorage.getItem("userId");
+      let fileContent = null;
+
+      // Step 1: Extract text from file if uploaded
+      if (file) {
+        setProgress("Extracting text from file...");
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const extractRes = await fetch("/api/extract", { method: "POST", body: formData });
+        if (!extractRes.ok) {
+          const err = await extractRes.json();
+          throw new Error(err.error || "Failed to extract file text");
+        }
+        const { text } = await extractRes.json();
+        fileContent = text;
+      }
+
+      // Step 2: Generate slides via AI
+      setProgress("AI is generating your slides...");
+      const genRes = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          topic: topic || (file ? file.name.replace(/\.[^/.]+$/, "") : "General"),
+          fileContent,
+          template: selectedTemplate,
+          slideCount: 15,
+        }),
+      });
+
+      if (!genRes.ok) {
+        const err = await genRes.json();
+        throw new Error(err.error || "Failed to generate slides");
+      }
+
+      const { slides } = await genRes.json();
+      const presentationTitle = topic || (file ? file.name.replace(/\.[^/.]+$/, "") : "AI Presentation");
+
+      // Step 3: Record upload + presentation in Supabase
+      setProgress("Saving presentation...");
+      let presentationId = null;
+
+      if (userId) {
+        if (file) {
+          await createUpload({
+            userId,
+            fileName: file.name,
+            fileType: file.type || file.name.split(".").pop(),
+            filePath: file.name,
+            fileSize: file.size,
+          });
+        }
+
+        const presentation = await createPresentation({
+          userId,
+          title: presentationTitle,
+          topic: topic || "General",
+          template: selectedTemplate,
+          slidesCount: slides.length,
+          status: "completed",
+          filePath: file?.name || null,
+          fileSize: file?.size || 0,
+        });
+        presentationId = presentation.id;
+
+        // Save slides content as JSON in the presentation record
+        await updatePresentation(presentationId, { slides_data: JSON.stringify(slides) });
+      }
+
+      // Step 4: Navigate to preview — pass slides via sessionStorage
+      sessionStorage.setItem("generatedSlides", JSON.stringify(slides));
+      sessionStorage.setItem("slidesMeta", JSON.stringify({
+        title: presentationTitle,
+        template: selectedTemplate,
+        presentationId,
+      }));
+
+      router.push(`/preview?topic=${encodeURIComponent(presentationTitle)}&template=${selectedTemplate}${presentationId ? `&id=${presentationId}` : ""}`);
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "Something went wrong. Please try again.");
+    } finally {
+      setGenerating(false);
+      setProgress("");
+    }
   }
 
   return (
@@ -142,12 +235,16 @@ export default function UploadPage() {
             {/* Generate Button */}
             <button 
               onClick={handleGenerate}
-              disabled={!file && !topic}
+              disabled={(!file && !topic) || generating}
               className="w-full inline-flex items-center justify-center gap-3 px-8 py-5 rounded-xl bg-indigo-600 text-white font-semibold text-lg shadow-lg hover:bg-indigo-700 hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-indigo-600"
             >
-              <Sparkles className="w-6 h-6" />
-              <span>Generate Slides</span>
-              <ArrowRight className="w-5 h-5" />
+              {generating ? (
+                <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <Sparkles className="w-6 h-6" />
+              )}
+              <span>{generating ? "Generating..." : "Generate Slides"}</span>
+              {!generating && <ArrowRight className="w-5 h-5" />}
             </button>
 
             {/* Helper Text */}

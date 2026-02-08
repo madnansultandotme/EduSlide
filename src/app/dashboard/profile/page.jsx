@@ -14,18 +14,21 @@ import {
   Settings
 } from "lucide-react";
 import Link from "next/link";
+import { getUserById, updateUser } from "../../../lib/api";
 
 export default function ProfilePage() {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [profileData, setProfileData] = useState({
-    name: "John Educator",
-    email: "john.educator@example.com",
+    name: "",
+    email: "",
     role: "Educator",
-    institution: "Government College University",
-    department: "Computer Science",
-    phone: "+92 300 1234567"
+    institution: "",
+    department: "",
+    phone: ""
   });
 
   const [notifications, setNotifications] = useState({
@@ -41,18 +44,56 @@ export default function ProfilePage() {
       router.push("/login");
     } else {
       setIsAuthenticated(true);
+      const userId = localStorage.getItem("userId");
+      if (userId) {
+        getUserById(userId)
+          .then(user => {
+            setProfileData({
+              name: user.full_name || "",
+              email: user.email || "",
+              role: user.role || "Educator",
+              institution: user.institution || "",
+              department: user.department || "",
+              phone: user.phone || "",
+            });
+          })
+          .catch(console.error)
+          .finally(() => setLoading(false));
+      } else {
+        setLoading(false);
+      }
     }
   }, [router]);
 
   const handleLogout = () => {
     localStorage.removeItem("authToken");
+    localStorage.removeItem("userId");
     localStorage.removeItem("userRole");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("userEmail");
     router.push("/login");
   };
 
-  const handleSaveProfile = (e) => {
+  const handleSaveProfile = async (e) => {
     e.preventDefault();
-    alert("Profile updated successfully!");
+    setSaving(true);
+    try {
+      const userId = localStorage.getItem("userId");
+      await updateUser(userId, {
+        full_name: profileData.name,
+        email: profileData.email,
+        institution: profileData.institution,
+        department: profileData.department,
+        phone: profileData.phone,
+      });
+      // Update localStorage name to reflect in navbar
+      localStorage.setItem("userName", profileData.name);
+      alert("Profile updated successfully!");
+    } catch (err) {
+      alert("Failed to update profile: " + err.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleSaveNotifications = (e) => {
@@ -236,10 +277,15 @@ export default function ProfilePage() {
                     <div className="flex justify-end pt-4">
                       <button
                         type="submit"
-                        className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-all duration-200"
+                        disabled={saving}
+                        className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-all duration-200 disabled:opacity-50"
                       >
-                        <Save className="w-5 h-5" />
-                        Save Changes
+                        {saving ? (
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <Save className="w-5 h-5" />
+                        )}
+                        {saving ? "Saving..." : "Save Changes"}
                       </button>
                     </div>
                   </form>

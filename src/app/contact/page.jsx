@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Mail, Phone, MapPin, Send, MessageSquare } from "lucide-react";
+import { submitContactMessage } from "../../lib/api";
 
 export default function ContactPage() {
   const router = useRouter();
@@ -13,6 +14,8 @@ export default function ContactPage() {
     message: ""
   });
 
+  const [submitting, setSubmitting] = useState(false);
+
   useEffect(() => {
     // Redirect logged-in users to dashboard
     const token = localStorage.getItem("authToken");
@@ -21,10 +24,18 @@ export default function ContactPage() {
     }
   }, [router]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert("Thank you for your message! We'll get back to you soon.");
-    setFormData({ name: "", email: "", subject: "", message: "" });
+    setSubmitting(true);
+    try {
+      await submitContactMessage(formData);
+      alert("Thank you for your message! We'll get back to you soon.");
+      setFormData({ name: "", email: "", subject: "", message: "" });
+    } catch (err) {
+      alert("Failed to send message. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleChange = (e) => {
@@ -168,10 +179,15 @@ export default function ContactPage() {
 
                   <button
                     type="submit"
-                    className="w-full inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-indigo-600 text-white font-semibold text-lg shadow-lg hover:bg-indigo-700 hover:shadow-xl transition-all duration-200"
+                    disabled={submitting}
+                    className="w-full inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-indigo-600 text-white font-semibold text-lg shadow-lg hover:bg-indigo-700 hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <Send className="w-5 h-5" />
-                    <span>Send Message</span>
+                    {submitting ? (
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <Send className="w-5 h-5" />
+                    )}
+                    <span>{submitting ? "Sending..." : "Send Message"}</span>
                   </button>
                 </form>
               </div>

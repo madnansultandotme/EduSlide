@@ -23,11 +23,14 @@ import {
   LogOut
 } from "lucide-react";
 import Link from "next/link";
+import { getDashboardStats } from "../../lib/api";
 
 export default function DashboardPage() {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
+  const [dashData, setDashData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -35,6 +38,15 @@ export default function DashboardPage() {
       router.push("/login");
     } else {
       setIsAuthenticated(true);
+      const userId = localStorage.getItem("userId");
+      if (userId) {
+        getDashboardStats(userId)
+          .then(data => setDashData(data))
+          .catch(console.error)
+          .finally(() => setLoading(false));
+      } else {
+        setLoading(false);
+      }
     }
   }, [router]);
 
@@ -52,72 +64,35 @@ export default function DashboardPage() {
   const stats = [
     {
       label: "Total Presentations",
-      value: "24",
+      value: dashData?.totalPresentations ?? "0",
       change: "+12%",
       icon: FileText,
       color: "bg-blue-500"
     },
     {
       label: "Topics Created",
-      value: "18",
+      value: dashData?.totalTopics ?? "0",
       change: "+8%",
       icon: BookOpen,
       color: "bg-indigo-500"
     },
     {
       label: "Files Uploaded",
-      value: "32",
+      value: dashData?.totalUploads ?? "0",
       change: "+15%",
       icon: Upload,
       color: "bg-purple-500"
     },
     {
       label: "Downloads",
-      value: "156",
+      value: dashData?.totalDownloads ?? "0",
       change: "+23%",
       icon: Download,
       color: "bg-green-500"
     }
   ];
 
-  const recentPresentations = [
-    {
-      id: 1,
-      title: "Introduction to Machine Learning",
-      topic: "AI & ML",
-      slides: 15,
-      status: "completed",
-      date: "2024-02-07",
-      downloads: 12
-    },
-    {
-      id: 2,
-      title: "World War II History",
-      topic: "History",
-      slides: 20,
-      status: "completed",
-      date: "2024-02-06",
-      downloads: 8
-    },
-    {
-      id: 3,
-      title: "Photosynthesis Process",
-      topic: "Biology",
-      slides: 12,
-      status: "processing",
-      date: "2024-02-07",
-      downloads: 0
-    },
-    {
-      id: 4,
-      title: "Shakespeare's Plays",
-      topic: "Literature",
-      slides: 18,
-      status: "completed",
-      date: "2024-02-05",
-      downloads: 15
-    }
-  ];
+  const recentPresentations = dashData?.recentPresentations || [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
@@ -272,11 +247,11 @@ export default function DashboardPage() {
                             </td>
                             <td className="py-4 px-4">
                               <span className="px-3 py-1 bg-indigo-100 text-indigo-700 text-sm font-medium rounded-full">
-                                {presentation.topic}
+                                {presentation.topic || 'General'}
                               </span>
                             </td>
                             <td className="py-4 px-4 text-slate-600">
-                              {presentation.slides} slides
+                              {presentation.slides_count || 0} slides
                             </td>
                             <td className="py-4 px-4">
                               {presentation.status === "completed" ? (
@@ -292,7 +267,7 @@ export default function DashboardPage() {
                               )}
                             </td>
                             <td className="py-4 px-4 text-slate-600 text-sm">
-                              {presentation.date}
+                              {presentation.created_at ? new Date(presentation.created_at).toLocaleDateString() : 'N/A'}
                             </td>
                             <td className="py-4 px-4">
                               <div className="flex items-center gap-2">

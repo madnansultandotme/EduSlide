@@ -18,79 +18,14 @@ import {
   MoreVertical
 } from "lucide-react";
 import Link from "next/link";
+import { getPresentations, deletePresentation as apiDeletePresentation, incrementPresentationDownloads, trackEvent } from "../../../lib/api";
 
 export default function PresentationsPage() {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [filterStatus, setFilterStatus] = useState("all");
-  const [presentations, setPresentations] = useState([
-    {
-      id: 1,
-      title: "Introduction to Machine Learning",
-      topic: "AI & ML",
-      slides: 15,
-      status: "completed",
-      date: "2024-02-07",
-      downloads: 12,
-      views: 45,
-      fileSize: "2.4 MB"
-    },
-    {
-      id: 2,
-      title: "World War II History",
-      topic: "History",
-      slides: 20,
-      status: "completed",
-      date: "2024-02-06",
-      downloads: 8,
-      views: 32,
-      fileSize: "3.1 MB"
-    },
-    {
-      id: 3,
-      title: "Photosynthesis Process",
-      topic: "Biology",
-      slides: 12,
-      status: "processing",
-      date: "2024-02-07",
-      downloads: 0,
-      views: 0,
-      fileSize: "1.8 MB"
-    },
-    {
-      id: 4,
-      title: "Shakespeare's Plays",
-      topic: "Literature",
-      slides: 18,
-      status: "completed",
-      date: "2024-02-05",
-      downloads: 15,
-      views: 58,
-      fileSize: "2.9 MB"
-    },
-    {
-      id: 5,
-      title: "Quantum Physics Basics",
-      topic: "Physics",
-      slides: 16,
-      status: "completed",
-      date: "2024-02-04",
-      downloads: 10,
-      views: 38,
-      fileSize: "2.6 MB"
-    },
-    {
-      id: 6,
-      title: "Ancient Rome Civilization",
-      topic: "History",
-      slides: 14,
-      status: "failed",
-      date: "2024-02-03",
-      downloads: 0,
-      views: 0,
-      fileSize: "0 MB"
-    }
-  ]);
+  const [presentations, setPresentations] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -98,17 +33,40 @@ export default function PresentationsPage() {
       router.push("/login");
     } else {
       setIsAuthenticated(true);
+      const userId = localStorage.getItem("userId");
+      if (userId) {
+        getPresentations(userId)
+          .then(data => setPresentations(data))
+          .catch(console.error)
+          .finally(() => setLoading(false));
+      } else {
+        setLoading(false);
+      }
     }
   }, [router]);
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (confirm("Are you sure you want to delete this presentation?")) {
-      setPresentations(presentations.filter(p => p.id !== id));
+      try {
+        await apiDeletePresentation(id);
+        setPresentations(presentations.filter(p => p.id !== id));
+      } catch (err) {
+        alert("Failed to delete presentation");
+      }
     }
   };
 
-  const handleDownload = (presentation) => {
-    alert(`Downloading: ${presentation.title}`);
+  const handleDownload = async (presentation) => {
+    try {
+      const userId = localStorage.getItem("userId");
+      await incrementPresentationDownloads(presentation.id);
+      if (userId) {
+        await trackEvent({ userId, presentationId: presentation.id, eventType: 'download' });
+      }
+      alert(`Downloading: ${presentation.title}`);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const filteredPresentations = presentations.filter(p => {
@@ -253,16 +211,16 @@ export default function PresentationsPage() {
                         {presentation.title}
                       </div>
                       <div className="text-sm text-slate-500">
-                        {presentation.fileSize}
+                        {presentation.file_size ? `${(presentation.file_size / 1024 / 1024).toFixed(1)} MB` : '0 MB'}
                       </div>
                     </td>
                     <td className="py-4 px-6">
                       <span className="px-3 py-1 bg-indigo-100 text-indigo-700 text-sm font-medium rounded-full">
-                        {presentation.topic}
+                        {presentation.topic || 'General'}
                       </span>
                     </td>
                     <td className="py-4 px-6 text-slate-600">
-                      {presentation.slides} slides
+                      {presentation.slides_count || 0} slides
                     </td>
                     <td className="py-4 px-6">
                       {presentation.status === "completed" && (
@@ -286,14 +244,14 @@ export default function PresentationsPage() {
                     </td>
                     <td className="py-4 px-6">
                       <div className="text-sm text-slate-600">
-                        <div>{presentation.views} views</div>
-                        <div>{presentation.downloads} downloads</div>
+                        <div>{presentation.views || 0} views</div>
+                        <div>{presentation.downloads || 0} downloads</div>
                       </div>
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-2 text-sm text-slate-600">
                         <Calendar className="w-4 h-4" />
-                        {presentation.date}
+                        {presentation.created_at ? new Date(presentation.created_at).toLocaleDateString() : 'N/A'}
                       </div>
                     </td>
                     <td className="py-4 px-6">

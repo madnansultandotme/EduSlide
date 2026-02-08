@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Sparkles, Lock, User, Mail, Eye, EyeOff, UserPlus, Building, Phone } from "lucide-react";
 import Link from "next/link";
+import { signUp } from "../../lib/api";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -38,7 +39,9 @@ export default function SignupPage() {
     });
   };
 
-  const handleSignup = (e) => {
+  const [loading, setLoading] = useState(false);
+
+  const handleSignup = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -58,43 +61,35 @@ export default function SignupPage() {
       return;
     }
 
-    // Demo signup - In production, this would call an API
-    const users = JSON.parse(localStorage.getItem("users") || "[]");
-    
-    // Check if username or email already exists
-    const userExists = users.some(
-      u => u.username === formData.username || u.email === formData.email
-    );
+    setLoading(true);
+    try {
+      await signUp({
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+        fullName: formData.fullName,
+        institution: formData.institution,
+        department: formData.department,
+        phone: formData.phone,
+        role: formData.role,
+      });
 
-    if (userExists) {
-      setError("Username or email already exists");
-      return;
+      // Show success message
+      setSuccess(true);
+
+      // Redirect to login after 2 seconds
+      setTimeout(() => {
+        router.push("/login");
+      }, 2000);
+    } catch (err) {
+      if (err.message?.includes("duplicate") || err.code === "23505") {
+        setError("Username or email already exists");
+      } else {
+        setError(err.message || "Signup failed. Please try again.");
+      }
+    } finally {
+      setLoading(false);
     }
-
-    // Add new user
-    const newUser = {
-      id: Date.now(),
-      fullName: formData.fullName,
-      email: formData.email,
-      username: formData.username,
-      password: formData.password, // In production, this should be hashed
-      institution: formData.institution,
-      department: formData.department,
-      phone: formData.phone,
-      role: formData.role,
-      createdAt: new Date().toISOString()
-    };
-
-    users.push(newUser);
-    localStorage.setItem("users", JSON.stringify(users));
-
-    // Show success message
-    setSuccess(true);
-
-    // Redirect to login after 2 seconds
-    setTimeout(() => {
-      router.push("/login");
-    }, 2000);
   };
 
   return (
@@ -364,10 +359,15 @@ export default function SignupPage() {
               {/* Signup Button */}
               <button
                 type="submit"
-                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-all duration-200 shadow-md hover:shadow-lg"
+                disabled={loading}
+                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <UserPlus className="w-5 h-5" />
-                Create Account
+                {loading ? (
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <UserPlus className="w-5 h-5" />
+                )}
+                {loading ? "Creating Account..." : "Create Account"}
               </button>
             </form>
           )}

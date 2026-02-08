@@ -13,11 +13,14 @@ import {
   Activity
 } from "lucide-react";
 import Link from "next/link";
+import { getAnalyticsStats } from "../../../lib/api";
 
 export default function AnalyticsPage() {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [timeRange, setTimeRange] = useState("7days");
+  const [analyticsData, setAnalyticsData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -25,6 +28,15 @@ export default function AnalyticsPage() {
       router.push("/login");
     } else {
       setIsAuthenticated(true);
+      const userId = localStorage.getItem("userId");
+      if (userId) {
+        getAnalyticsStats(userId)
+          .then(data => setAnalyticsData(data))
+          .catch(console.error)
+          .finally(() => setLoading(false));
+      } else {
+        setLoading(false);
+      }
     }
   }, [router]);
 
@@ -42,7 +54,7 @@ export default function AnalyticsPage() {
   const stats = [
     {
       label: "Total Views",
-      value: "2,847",
+      value: analyticsData?.totalViews?.toLocaleString() || "0",
       change: "+18.2%",
       icon: Activity,
       color: "text-blue-600",
@@ -50,7 +62,7 @@ export default function AnalyticsPage() {
     },
     {
       label: "Downloads",
-      value: "1,234",
+      value: analyticsData?.totalDownloads?.toLocaleString() || "0",
       change: "+12.5%",
       icon: Download,
       color: "text-green-600",
@@ -58,15 +70,15 @@ export default function AnalyticsPage() {
     },
     {
       label: "Presentations",
-      value: "156",
+      value: analyticsData?.totalPresentations?.toString() || "0",
       change: "+8.3%",
       icon: FileText,
       color: "text-indigo-600",
       bgColor: "bg-indigo-100"
     },
     {
-      label: "Active Users",
-      value: "89",
+      label: "Topics",
+      value: analyticsData?.totalTopics?.toString() || "0",
       change: "+23.1%",
       icon: Users,
       color: "text-purple-600",
@@ -74,21 +86,13 @@ export default function AnalyticsPage() {
     }
   ];
 
-  const topPresentations = [
-    { title: "Machine Learning Basics", views: 342, downloads: 89 },
-    { title: "World War II History", views: 298, downloads: 76 },
-    { title: "Photosynthesis Process", views: 267, downloads: 65 },
-    { title: "Shakespeare's Plays", views: 234, downloads: 58 },
-    { title: "Quantum Physics", views: 198, downloads: 45 }
-  ];
+  const topPresentations = (analyticsData?.topPresentations || []).map(p => ({
+    title: p.title,
+    views: p.views || 0,
+    downloads: p.downloads || 0,
+  }));
 
-  const categoryData = [
-    { name: "Science", count: 45, percentage: 30 },
-    { name: "History", count: 38, percentage: 25 },
-    { name: "Technology", count: 32, percentage: 21 },
-    { name: "Literature", count: 24, percentage: 16 },
-    { name: "Others", count: 12, percentage: 8 }
-  ];
+  const categoryData = analyticsData?.categoryData || [];
 
   const activityData = [
     { day: "Mon", presentations: 12, downloads: 34 },

@@ -15,38 +15,16 @@ import {
   Save
 } from "lucide-react";
 import Link from "next/link";
+import { getTopics, createTopic as apiCreateTopic, updateTopic as apiUpdateTopic, deleteTopic as apiDeleteTopic } from "../../../lib/api";
 
 export default function TopicsPage() {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [topics, setTopics] = useState([
-    {
-      id: 1,
-      name: "Machine Learning Basics",
-      category: "AI & Technology",
-      description: "Introduction to ML concepts and algorithms",
-      presentations: 3,
-      createdAt: "2024-02-01"
-    },
-    {
-      id: 2,
-      name: "World War II",
-      category: "History",
-      description: "Major events and impacts of WWII",
-      presentations: 2,
-      createdAt: "2024-02-03"
-    },
-    {
-      id: 3,
-      name: "Photosynthesis",
-      category: "Biology",
-      description: "Plant biology and energy conversion",
-      presentations: 1,
-      createdAt: "2024-02-05"
-    }
-  ]);
+  const [topics, setTopics] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingTopic, setEditingTopic] = useState(null);
+  const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     category: "",
@@ -59,6 +37,15 @@ export default function TopicsPage() {
       router.push("/login");
     } else {
       setIsAuthenticated(true);
+      const userId = localStorage.getItem("userId");
+      if (userId) {
+        getTopics(userId)
+          .then(data => setTopics(data))
+          .catch(console.error)
+          .finally(() => setLoading(false));
+      } else {
+        setLoading(false);
+      }
     }
   }, [router]);
 
@@ -78,30 +65,40 @@ export default function TopicsPage() {
     setShowModal(true);
   };
 
-  const handleDeleteTopic = (id) => {
+  const handleDeleteTopic = async (id) => {
     if (confirm("Are you sure you want to delete this topic?")) {
-      setTopics(topics.filter(t => t.id !== id));
+      try {
+        await apiDeleteTopic(id);
+        setTopics(topics.filter(t => t.id !== id));
+      } catch (err) {
+        alert("Failed to delete topic");
+      }
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editingTopic) {
-      setTopics(topics.map(t => 
-        t.id === editingTopic.id 
-          ? { ...t, ...formData }
-          : t
-      ));
-    } else {
-      const newTopic = {
-        id: topics.length + 1,
-        ...formData,
-        presentations: 0,
-        createdAt: new Date().toISOString().split('T')[0]
-      };
-      setTopics([...topics, newTopic]);
+    setSaving(true);
+    try {
+      if (editingTopic) {
+        const updated = await apiUpdateTopic(editingTopic.id, formData);
+        setTopics(topics.map(t => t.id === editingTopic.id ? updated : t));
+      } else {
+        const userId = localStorage.getItem("userId");
+        const newTopic = await apiCreateTopic({
+          userId,
+          name: formData.name,
+          category: formData.category,
+          description: formData.description,
+        });
+        setTopics([newTopic, ...topics]);
+      }
+      setShowModal(false);
+    } catch (err) {
+      alert("Failed to save topic");
+    } finally {
+      setSaving(false);
     }
-    setShowModal(false);
   };
 
   if (!isAuthenticated) {
@@ -201,11 +198,11 @@ export default function TopicsPage() {
               <div className="flex items-center justify-between pt-4 border-t border-slate-200">
                 <div className="flex items-center gap-2 text-sm text-slate-600">
                   <FileText className="w-4 h-4" />
-                  <span>{topic.presentations} presentations</span>
+                  <span>{topic.presentations_count || 0} presentations</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-slate-500">
                   <Calendar className="w-4 h-4" />
-                  <span>{topic.createdAt}</span>
+                  <span>{topic.created_at ? new Date(topic.created_at).toLocaleDateString() : 'N/A'}</span>
                 </div>
               </div>
             </div>
@@ -302,9 +299,14 @@ export default function TopicsPage() {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-all duration-200"
+                  disabled={saving}
+                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-all duration-200 disabled:opacity-50"
                 >
-                  <Save className="w-5 h-5" />
+                  {saving ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Save className="w-5 h-5" />
+                  )}
                   {editingTopic ? "Update" : "Add"} Topic
                 </button>
               </div>
