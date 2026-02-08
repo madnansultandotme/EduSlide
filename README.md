@@ -2,204 +2,192 @@
 
 Transform your learning materials into professional PowerPoint presentations with the power of AI.
 
-## 🚀 Overview
+---
 
-EduSlide AI is an AI-powered platform designed to help educators save time by automatically converting PDFs, eBooks, or topics into beautiful, well-structured PowerPoint presentations. Built with Next.js 16 and React 19, it features a modern, professional UI with a clean design system.
+## Problem Statement
 
-## ✨ Features
+Educators spend **hours** manually creating lecture slides from PDFs, eBooks, and notes — a repetitive, time-consuming process that takes focus away from actual teaching. Existing tools offer no end-to-end pipeline to go from raw educational content to a ready-to-present slide deck.
 
-### Current Implementation
+## Solution
 
-- **🎨 Professional UI/UX**
-  - Clean, modern design with indigo color scheme
-  - Responsive layout for all devices
-  - Smooth transitions and hover effects
-  - Professional typography and spacing
+**EduSlide AI** is a full-stack, AI-powered web platform that lets educators:
 
-- **📄 Multiple Input Methods**
-  - Upload PDF, DOCX, or EPUB files
-  - Drag-and-drop file upload
-  - Enter topics directly without files
-  - File validation and preview
+1. **Upload** a PDF (or type a topic directly).
+2. **Generate** a structured presentation using OpenAI GPT-4o-mini — with bullet points, speaker notes, and mixed layouts.
+3. **Preview** the slides in-browser with thumbnail navigation.
+4. **Download** a polished `.pptx` file (six built-in themes) in one click.
 
-- **🤖 AI-Powered Generation** (Demo Mode)
-  - Automatic slide generation
-  - Content organization and structuring
-  - Professional slide layouts
-  - Preview before download
-
-- **👀 Slide Preview**
-  - Interactive slide navigation
-  - Thumbnail view of all slides
-  - Full-screen slide display
-  - Download to PowerPoint
-
-- **📱 Complete Website**
-  - Landing page with features and testimonials
-  - About page with mission and values
-  - Contact page with form and FAQ
-  - Responsive navigation with active states
-
-## 🛠️ Tech Stack
-
-- **Framework:** Next.js 16.1.6 (with Turbopack)
-- **React:** 19.2.3
-- **Styling:** Tailwind CSS 4.1.18
-- **Icons:** Lucide React 0.563.0
-- **Build Tool:** Turbopack (Next.js built-in)
-- **Linting:** ESLint 9 with Next.js config
-
-## 📦 Installation
-
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd eduslide-
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Run the development server:
-```bash
-npm run dev
-```
-
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-## 🏗️ Project Structure
-
-```
-eduslide-/
-├── src/
-│   ├── app/
-│   │   ├── about/
-│   │   │   └── page.jsx          # About page
-│   │   ├── contact/
-│   │   │   └── page.jsx          # Contact page
-│   │   ├── preview/
-│   │   │   └── page.jsx          # Slide preview page
-│   │   ├── upload/
-│   │   │   └── page.jsx          # File upload page
-│   │   ├── globals.css           # Global styles
-│   │   ├── layout.jsx            # Root layout
-│   │   └── page.jsx              # Landing page
-│   ├── components/
-│   │   ├── FileUpload.jsx        # File upload component
-│   │   ├── Loader.jsx            # Loading spinner
-│   │   ├── Navbar.jsx            # Navigation bar
-│   │   ├── SlideCard.jsx         # Slide display card
-│   │   └── TopicInput.jsx        # Topic input field
-│   └── lib/
-│       └── api.js                # API utility functions
-├── public/                       # Static assets
-├── .next/                        # Next.js build output
-├── node_modules/                 # Dependencies
-├── eslint.config.mjs            # ESLint configuration
-├── jsconfig.json                # JavaScript config
-├── next.config.mjs              # Next.js configuration
-├── package.json                 # Project dependencies
-├── postcss.config.mjs           # PostCSS configuration
-├── tailwind.config.js           # Tailwind CSS config
-└── README.md                    # This file
-```
-
-## 📝 Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm start` - Start production server
-- `npm run lint` - Run ESLint
-
-## 🎯 Key Pages
-
-### Landing Page (`/`)
-- Hero section with CTA
-- Feature highlights
-- Statistics showcase
-- How it works section
-- Testimonials
-- Footer with links
-
-### Upload Page (`/upload`)
-- File upload with drag-and-drop
-- Topic input field
-- File format validation
-- Generate slides button
-
-### Preview Page (`/preview`)
-- Slide navigation controls
-- Full slide display
-- Thumbnail grid
-- Download button
-
-### About Page (`/about`)
-- Mission statement
-- Company values
-- Statistics
-- Team story
-
-### Contact Page (`/contact`)
-- Contact form
-- Contact information
-- FAQ section
-
-## 🎨 Design System
-
-### Colors
-- **Primary:** Indigo-600 (#4F46E5)
-- **Background:** Gradient from slate-50 to indigo-50
-- **Text:** Slate-800 (headings), Slate-600 (body)
-- **Borders:** Slate-200/300
-- **Accents:** Green, Amber, Blue for icons
-
-### Typography
-- **Headings:** Bold, Slate-800
-- **Body:** Medium weight, Slate-600
-- **Font:** System font stack (Arial, Helvetica, sans-serif)
-
-## 🔧 Configuration
-
-### Tailwind CSS
-The project uses Tailwind CSS 4 with custom configuration in `tailwind.config.js`. Content paths are configured to scan all JSX/TSX files in `src/app` and `src/components`.
-
-### Next.js
-- React Compiler enabled for better performance
-- Turbopack for faster builds
-- App Router architecture
-
-## 🚧 Future Enhancements
-
-- [ ] Backend API integration for real AI processing
-- [ ] User authentication and accounts
-- [ ] Save and manage presentations
-- [ ] Custom template selection
-- [ ] Advanced editing capabilities
-- [ ] Collaboration features
-- [ ] Analytics dashboard
-- [ ] Payment integration
-- [ ] Multi-language support
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
-## 👥 Support
-
-For support, email support@eduslide.ai or visit our contact page.
-
-## 🙏 Acknowledgments
-
-- Built with [Next.js](https://nextjs.org/)
-- Icons by [Lucide](https://lucide.dev/)
-- Styled with [Tailwind CSS](https://tailwindcss.com/)
+The entire flow — upload → extract text → generate slides → download PPTX — is fully functional, backed by real AI and real file processing.
 
 ---
 
-**Note:** This is currently a demo/prototype version. The AI generation functionality is simulated for demonstration purposes. Backend integration is required for full production deployment.
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| **Framework** | Next.js 16.1.6 (App Router, Turbopack) |
+| **Frontend** | React 19, Tailwind CSS 4 |
+| **Backend API** | Next.js Route Handlers (`/api/extract`, `/api/generate`) |
+| **AI Engine** | OpenAI GPT-4o-mini via `openai` SDK |
+| **PDF Parsing** | `pdf-parse` v2 (pdfjs-dist) |
+| **PPTX Export** | PptxGenJS 4 (6 themed templates) |
+| **Database / Auth** | Supabase (PostgreSQL + Auth) |
+| **Icons** | Lucide React |
+| **Linting** | ESLint 9 with Next.js config |
+
+---
+
+## System Diagram
+
+```
+┌──────────────┐        ┌───────────────────────────────────────────┐
+│   Browser    │        │          Next.js 16 (Turbopack)           │
+│              │        │                                           │
+│  Upload Page ├──POST──▶  /api/extract                            │
+│  (PDF/topic) │        │    └─ pdf-parse → extracted text          │
+│              │        │                                           │
+│  Generate    ├──POST──▶  /api/generate                           │
+│              │        │    └─ OpenAI GPT-4o-mini → JSON slides    │
+│              │        │    └─ Supabase daily-limit check          │
+│              │        │                                           │
+│  Preview     │◀─JSON──┤  Slide data returned to client            │
+│              │        │                                           │
+│  Download    │        │  Client-side PptxGenJS                    │
+│  (.pptx)     │◀─BLOB──┤    └─ Themed PPTX generated in browser   │
+└──────────────┘        └───────────────────────────────────────────┘
+                                        │
+                                        ▼
+                                ┌───────────────┐
+                                │   Supabase     │
+                                │  (PostgreSQL)  │
+                                │  Auth + Data   │
+                                └───────────────┘
+```
+
+---
+
+## Features
+
+- **PDF Text Extraction** — Upload a PDF and the server extracts content via `pdf-parse` v2.
+- **AI Slide Generation** — GPT-4o-mini produces structured slides with titles, bullet points, speaker notes, and layout types.
+- **Daily Rate Limiting** — 3 generations per user per day, enforced server-side via Supabase.
+- **6 Presentation Themes** — Modern Professional, Academic Classic, Creative Vibrant, and more.
+- **PPTX Download** — Client-side `.pptx` creation with PptxGenJS (title slides, content slides, two-column, summary).
+- **Interactive Preview** — Navigate slides with thumbnails, previous/next controls, and full-screen view.
+- **Auth & Dashboard** — Supabase-backed signup/login, protected dashboard with presentations, topics, analytics, and profile pages.
+- **Responsive UI** — Tailwind CSS 4, indigo design system, smooth transitions across all screen sizes.
+
+---
+
+## Live Demo
+
+> **Repository:** [github.com/fatimaumer02/EduSlide-](https://github.com/fatimaumer02/EduSlide-)
+
+---
+
+## Installation
+
+```bash
+# 1. Clone
+git clone https://github.com/fatimaumer02/EduSlide-.git
+cd EduSlide-
+
+# 2. Install dependencies
+npm install
+
+# 3. Create .env.local with your keys
+#    NEXT_PUBLIC_SUPABASE_URL=...
+#    NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+#    OPENAI_API_KEY=...
+#    NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# 4. Run
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+### Available Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Production build |
+| `npm start` | Start production server |
+| `npm run lint` | Run ESLint |
+
+---
+
+## Project Structure
+
+```
+EduSlide-/
+├── src/
+│   ├── app/
+│   │   ├── api/
+│   │   │   ├── extract/route.js      # PDF text extraction endpoint
+│   │   │   └── generate/route.js     # AI slide generation endpoint
+│   │   ├── dashboard/                # Protected dashboard pages
+│   │   │   ├── page.jsx              # Main dashboard
+│   │   │   ├── analytics/page.jsx    # Analytics & reports
+│   │   │   ├── presentations/page.jsx# Presentations management
+│   │   │   ├── profile/page.jsx      # Profile & settings
+│   │   │   └── topics/page.jsx       # Topics management
+│   │   ├── login/page.jsx            # Login page
+│   │   ├── signup/page.jsx           # Signup page
+│   │   ├── upload/page.jsx           # File upload & topic input
+│   │   ├── preview/page.jsx          # Slide preview & download
+│   │   ├── templates/page.jsx        # Template selector
+│   │   ├── about/page.jsx            # About page
+│   │   ├── contact/page.jsx          # Contact page
+│   │   ├── layout.jsx                # Root layout
+│   │   ├── page.jsx                  # Landing page
+│   │   └── globals.css               # Global styles
+│   ├── components/
+│   │   ├── FileUpload.jsx            # Drag-and-drop file upload
+│   │   ├── Loader.jsx                # Loading spinner
+│   │   ├── Navbar.jsx                # Navigation bar
+│   │   ├── SlideCard.jsx             # Slide display card
+│   │   ├── TemplateSelector.jsx      # Theme picker
+│   │   └── TopicInput.jsx            # Topic input field
+│   └── lib/
+│       ├── api.js                    # Client-side API helpers
+│       ├── pptxGenerator.js          # PPTX creation (6 themes)
+│       └── supabase.js               # Supabase client
+├── scripts/
+│   └── seed-admin.js                 # Seed admin user
+├── doc/                              # Documentation
+├── next.config.mjs
+├── tailwind.config.js
+└── package.json
+```
+
+---
+
+## Team Members
+
+**Team Name:** Team Zeppelin
+
+| Name | Role |
+|------|------|
+| **Muhammad Adnan Sultan** | Team Member |
+| **Fatima Umer** | Team Member |
+| **Areeba Arooj** | Team Member |
+
+**Submitted For:** Hackathon  
+**Submission Date:** 08-02-2026
+
+---
+
+## License
+
+This project is licensed under the MIT License.
+
+## Acknowledgments
+
+- [Next.js](https://nextjs.org/) — Framework
+- [OpenAI](https://openai.com/) — AI Engine
+- [Supabase](https://supabase.com/) — Database & Auth
+- [Tailwind CSS](https://tailwindcss.com/) — Styling
+- [Lucide](https://lucide.dev/) — Icons
+- [PptxGenJS](https://github.com/gitbrent/PptxGenJS) — PPTX Generation
