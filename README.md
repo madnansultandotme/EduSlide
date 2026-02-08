@@ -81,7 +81,7 @@ The entire flow — upload → extract text → generate slides → download PPT
 
 ## Live Demo
 
-> **Repository:** [github.com/fatimaumer02/EduSlide-](https://github.com/fatimaumer02/EduSlide-)
+> **Vercel:** [https://eduslideai.vercel.app/](https://eduslideai.vercel.app/)
 
 ---
 
